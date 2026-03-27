@@ -612,29 +612,6 @@
         </div>
       </section>
 
-      <!-- tu progreso -->
-      <section class="card">
-        <div class="section-head">
-          <div>
-            <span class="label">Tu progreso</span>
-            <h2 style="margin-top:4px">Avance global</h2>
-          </div>
-        </div>
-        <div class="pulse-grid">
-          <div class="stat">
-            <span class="label">Tareas hechas</span>
-            <span class="stat-value" style="color:var(--green)" id="totalDoneCount">0</span>
-          </div>
-          <div class="stat">
-            <span class="label">Metas cerradas</span>
-            <span class="stat-value" style="color:var(--purple)" id="homeCompletedCount">0</span>
-          </div>
-          <div class="stat">
-            <span class="label">En progreso</span>
-            <span class="stat-value" id="homeFocusCount">0</span>
-          </div>
-        </div>
-      </section>
     </section>
 
     <!-- ─── CREATE ─── -->
@@ -760,9 +737,7 @@
       activeCount: $("#activeCount"),
       streakPill: $("#streakPill"),
       streakText: $("#streakText"),
-      totalDoneCount: $("#totalDoneCount"),
-      homeFocusCount: $("#homeFocusCount"),
-      homeCompletedCount: $("#homeCompletedCount"),
+
       goalsActiveBadge: $("#goalsActiveBadge"),
       todayLabel: $("#todayLabel"),
       focusText: $("#focusText"),
@@ -1100,9 +1075,7 @@
       refs.xpDisplay.textContent = xp;
       refs.activeCount.textContent = active.length;
       refs.streakText.textContent = state.streak + " días";
-      refs.totalDoneCount.textContent = doneTasks;
-      refs.homeFocusCount.textContent = active.length;
-      refs.homeCompletedCount.textContent = completed.length;
+
       refs.goalsActiveBadge.textContent = active.length + " activas";
     }
 
@@ -1306,23 +1279,7 @@
     /* ── persistence ── */
     function loadState() {
       var fallback = {
-        goals: [
-          {
-            id: uid(), title: "Lanzar mi proyecto iOS web",
-            priority: "high", energy: "deep",
-            createdAt: new Date().toISOString(),
-            tasks: [
-              { id: uid(), title: "Definir el valor principal de la app", done: true },
-              { id: uid(), title: "Crear una pantalla inicial más clara", done: false }
-            ]
-          },
-          {
-            id: uid(), title: "Preparar portfolio",
-            priority: "medium", energy: "light",
-            createdAt: new Date(Date.now() - 36e5).toISOString(),
-            tasks: []
-          }
-        ],
+        goals: [],
         streak: 0, lastDone: "", doneOn: "", doneToday: 0
       };
       try {
