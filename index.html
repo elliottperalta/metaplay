@@ -102,7 +102,7 @@
       --radius-xl: 32px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --nav-h: 82px;
+      --nav-h: 64px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -479,32 +479,32 @@
     /* ── bottom nav ── */
     .bottom-nav {
       position: fixed; left: 50%;
-      bottom: calc(10px + var(--safe-bottom));
+      bottom: calc(6px + var(--safe-bottom));
       transform: translateX(-50%);
       width: min(calc(100% - 24px), 500px);
-      display: flex; align-items: center; gap: 4px;
-      padding: 8px; border-radius: 22px;
+      display: flex; align-items: center; gap: 2px;
+      padding: 5px 6px; border-radius: 18px;
       background: var(--glass);
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
       z-index: 10;
     }
     .nav-btn {
       flex: 1; border: 0; background: transparent;
       color: var(--ink-secondary);
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-      padding: 10px 8px; border-radius: 16px;
-      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 6px 6px 5px; border-radius: 12px;
+      font-size: .62rem; font-weight: 700; letter-spacing: .02em;
       cursor: pointer;
       transition: color .2s, background .2s;
     }
-    .nav-btn svg { transition: transform .2s; }
+    .nav-btn svg { width: 18px; height: 18px; transition: transform .2s; }
     .nav-btn.active {
       color: var(--accent);
       background: var(--accent-soft);
     }
-    .nav-btn.active svg { transform: scale(1.12); }
+    .nav-btn.active svg { transform: scale(1.08); }
     .nav-btn:active { transform: scale(.95); }
 
     /* ── toast ── */
@@ -910,7 +910,7 @@
 
     refs.focusAction.addEventListener("click", function() {
       var rec = getFocusRecommendation();
-      if (!rec.goal) { switchScreen("create"); refs.goalInput.focus(); return; }
+      if (!rec.goal) return;
       if (rec.task) { scrollToGoal(rec.goal.id); return; }
       rec.goal.tasks.unshift({ id: uid(), title: suggestTask(rec.goal), done: false });
       saveState(); render();
@@ -1098,14 +1098,15 @@
     }
 
     function renderFocus() {
-      var rec = getFocusRecommendation();
-      if (!rec.goal) {
-        refs.focusBadge.textContent = "Nuevo";
-        refs.focusText.textContent = "Agrega una meta y la app te propone el siguiente paso.";
-        refs.focusMeta.textContent = "Pensado para abrir desde la pantalla de inicio y capturar ideas rápido.";
-        refs.focusAction.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Crear primera meta';
+      var active = getActiveGoals();
+      var section = document.getElementById("focusSection");
+      /* 0-1 metas: ocultar — no aporta valor */
+      if (active.length < 2) {
+        section.style.display = "none";
         return;
       }
+      section.style.display = "";
+      var rec = getFocusRecommendation();
       refs.focusBadge.textContent = priorityLabel(rec.goal.priority);
       refs.focusText.textContent = rec.task
         ? rec.goal.title + "  →  " + rec.task.title
