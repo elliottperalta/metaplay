@@ -1,0 +1,1298 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MetaPlay" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0f' width='100' height='100' rx='22'/><text x='50' y='68' text-anchor='middle' font-size='52'>🎯</text></svg>" />
+  <title>MetaPlay</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: rgba(255,255,255,0.06);
+      --bg-card-hover: rgba(255,255,255,0.09);
+      --bg-elevated: rgba(255,255,255,0.10);
+      --glass: rgba(28,28,35,0.72);
+      --glass-border: rgba(255,255,255,0.08);
+      --ink: #f5f5f7;
+      --ink-secondary: rgba(245,245,247,0.55);
+      --ink-tertiary: rgba(245,245,247,0.3);
+      --accent: #ff6b3d;
+      --accent-glow: rgba(255,107,61,0.35);
+      --accent-soft: rgba(255,107,61,0.12);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.12);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167,139,250,0.12);
+      --yellow: #fbbf24;
+      --yellow-soft: rgba(251,191,36,0.12);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.12);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96,165,250,0.12);
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 26px;
+      --radius-xl: 32px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --nav-h: 82px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+
+    body {
+      height: 100%;
+      font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: none;
+      overflow-x: hidden;
+    }
+
+    button, input, select, textarea { font: inherit; color: inherit; }
+
+    /* ── ambient lights ── */
+    .ambient {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .ambient::before, .ambient::after {
+      content: ""; position: absolute; border-radius: 50%; filter: blur(90px); opacity: .35;
+    }
+    .ambient::before {
+      width: 340px; height: 340px; top: -80px; left: -60px;
+      background: radial-gradient(circle, rgba(255,107,61,.4), transparent 70%);
+    }
+    .ambient::after {
+      width: 280px; height: 280px; bottom: 15%; right: -70px;
+      background: radial-gradient(circle, rgba(167,139,250,.3), transparent 70%);
+    }
+
+    /* ── app shell ── */
+    .app {
+      position: relative; z-index: 1;
+      width: min(100%, 520px);
+      margin: 0 auto;
+      min-height: 100%;
+      padding: calc(var(--safe-top) + 12px) 16px calc(var(--nav-h) + var(--safe-bottom) + 16px);
+    }
+
+    /* ── screen transitions ── */
+    .screen {
+      display: none; gap: 14px;
+      animation: screenIn .38s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    .screen.active { display: grid; align-content: start; }
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(18px) scale(.98); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ── typography ── */
+    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+    h2 { font-size: 1.18rem; font-weight: 700; letter-spacing: -.025em; }
+    h3 { font-size: .95rem; font-weight: 700; }
+    .label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-secondary); }
+    .sub { font-size: .88rem; color: var(--ink-secondary); line-height: 1.4; }
+
+    /* ── cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      transition: background .2s;
+    }
+    .card-elevated {
+      background: var(--bg-elevated);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    /* ── hero header ── */
+    .hero {
+      padding: 20px 18px;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(135deg, rgba(255,107,61,.12), rgba(167,139,250,.08) 60%, transparent),
+        var(--bg-card);
+      border: 1px solid var(--glass-border);
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ""; position: absolute; top: -40px; right: -30px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+      pointer-events: none;
+    }
+    .hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: relative; z-index: 1; }
+    .hero-title { display: flex; flex-direction: column; gap: 6px; }
+    .hero-title h1 { margin-top: 2px; }
+
+    .streak-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--accent-soft); color: var(--accent);
+      padding: 8px 14px; border-radius: 999px;
+      font-size: .82rem; font-weight: 800; white-space: nowrap;
+    }
+    .streak-badge svg { flex-shrink: 0; }
+
+    .stats-row {
+      display: flex; gap: 10px; margin-top: 18px; position: relative; z-index: 1;
+    }
+    .stat {
+      flex: 1; min-width: 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -.04em;
+      display: block; margin-top: 4px;
+    }
+    .stat-value.accent { color: var(--accent); }
+
+    /* ── circular progress (SVG) ── */
+    .ring-wrap {
+      width: 56px; height: 56px; position: relative; flex-shrink: 0;
+    }
+    .ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 5; }
+    .ring-fill {
+      fill: none; stroke: var(--accent); stroke-width: 5;
+      stroke-linecap: round;
+      transition: stroke-dashoffset .6s cubic-bezier(.36,.07,.19,.97);
+    }
+    .ring-label {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: .72rem; font-weight: 800; color: var(--ink);
+    }
+
+    /* ── focus card ── */
+    .focus-card {
+      background: linear-gradient(135deg, #1a1240, #2d1f6e 50%, #1a1240);
+      border: 1px solid rgba(167,139,250,0.15);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .focus-card::before {
+      content: ""; position: absolute; top: -20px; right: -20px;
+      width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(167,139,250,.25), transparent 70%);
+    }
+    .focus-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; position: relative; z-index: 1; }
+    .focus-body { position: relative; z-index: 1; margin-top: 14px; }
+    .focus-main { font-size: 1.1rem; font-weight: 600; line-height: 1.35; color: #e8e4ff; }
+    .focus-hint { font-size: .84rem; color: rgba(232,228,255,.5); margin-top: 8px; }
+    .focus-actions { display: flex; gap: 10px; margin-top: 18px; position: relative; z-index: 1; }
+    .focus-badge {
+      padding: 6px 12px; border-radius: 999px;
+      background: rgba(167,139,250,.15); color: var(--purple);
+      font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+    }
+
+    /* ── level bar ── */
+    .level-card {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 18px;
+    }
+    .level-info { flex: 1; min-width: 0; }
+    .level-bar-shell {
+      width: 100%; height: 8px; border-radius: 999px;
+      background: rgba(255,255,255,0.06); overflow: hidden; margin-top: 8px;
+    }
+    .level-bar-fill {
+      height: 100%; border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #fbbf24);
+      transition: width .6s cubic-bezier(.36,.07,.19,.97);
+    }
+    .level-num {
+      font-size: 2rem; font-weight: 900; color: var(--accent);
+      line-height: 1; letter-spacing: -.04em;
+    }
+
+    /* ── buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 0; cursor: pointer; font-weight: 700; font-size: .88rem;
+      border-radius: var(--radius-sm); padding: 13px 18px;
+      transition: transform .15s, opacity .15s, background .15s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn svg { flex-shrink: 0; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ff9563);
+      color: #fff;
+      box-shadow: 0 8px 28px var(--accent-glow);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.06);
+      color: var(--ink);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-ghost-light {
+      background: rgba(255,255,255,0.08);
+      color: rgba(232,228,255,.9);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-small {
+      padding: 10px 14px; font-size: .8rem; border-radius: 14px;
+    }
+    .btn-icon {
+      width: 38px; height: 38px; padding: 0;
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+      display: inline-grid; place-items: center; cursor: pointer;
+      transition: transform .15s, background .15s;
+    }
+    .btn-icon:active { transform: scale(.93); }
+    .btn-danger { background: var(--red-soft); color: var(--red); border-color: transparent; }
+
+    /* ── form ── */
+    .form-grid { display: grid; gap: 12px; margin-top: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .input, .select-wrap select {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--ink); border-radius: var(--radius-sm);
+      padding: 14px 16px; outline: none; appearance: none;
+      font-size: .92rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input::placeholder { color: var(--ink-tertiary); }
+    .input:focus, .select-wrap select:focus {
+      border-color: rgba(255,107,61,.4);
+      box-shadow: 0 0 0 4px rgba(255,107,61,.1);
+    }
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap::after {
+      content: "";
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      border: 5px solid transparent; border-top: 6px solid var(--ink-secondary);
+      pointer-events: none;
+    }
+
+    /* ── inline task input ── */
+    .inline-input-wrap {
+      display: none; gap: 8px; margin-top: 10px;
+      animation: slideDown .25s ease;
+    }
+    .inline-input-wrap.open { display: flex; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: none; }
+    }
+    .inline-input-wrap .input { flex: 1; padding: 12px 14px; }
+    .inline-input-wrap .btn { flex-shrink: 0; }
+
+    /* ── chips / filters ── */
+    .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .chip {
+      padding: 9px 14px; border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--ink-secondary);
+      font-size: .82rem; font-weight: 700; cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .chip.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(255,107,61,.2);
+    }
+
+    /* ── tags ── */
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 999px;
+      font-size: .72rem; font-weight: 700;
+    }
+    .tag-high { background: rgba(248,113,113,.12); color: var(--red); }
+    .tag-medium { background: var(--yellow-soft); color: var(--yellow); }
+    .tag-low { background: var(--blue-soft); color: var(--blue); }
+    .tag-deep { background: var(--purple-soft); color: var(--purple); }
+    .tag-light { background: var(--green-soft); color: var(--green); }
+    .tag-count { background: rgba(255,255,255,0.06); color: var(--ink-secondary); }
+
+    /* ── goal cards ── */
+    .goal-list, .completed-list { display: grid; gap: 12px; margin-top: 14px; }
+
+    .goal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      transition: background .2s;
+    }
+    .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .goal-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.3; }
+    .goal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+    /* ── progress bar ── */
+    .progress-shell {
+      width: 100%; height: 6px; border-radius: 999px;
+      background: rgba(255,255,255,0.06); overflow: hidden;
+      margin-top: 14px;
+    }
+    .progress-fill {
+      height: 100%; border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--yellow));
+      transition: width .5s cubic-bezier(.36,.07,.19,.97);
+    }
+
+    /* ── task list ── */
+    .task-list { display: grid; gap: 6px; margin-top: 12px; }
+    .task-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: var(--radius-sm);
+      transition: background .15s;
+    }
+
+    /* ── custom checkbox ── */
+    .check-wrap { position: relative; flex-shrink: 0; width: 24px; height: 24px; }
+    .check-wrap input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 1;
+      width: 100%; height: 100%; margin: 0;
+    }
+    .check-visual {
+      width: 24px; height: 24px; border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.15);
+      display: grid; place-items: center;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .check-visual svg { opacity: 0; transform: scale(.5); transition: opacity .2s, transform .2s; }
+    .check-wrap input:checked + .check-visual {
+      background: var(--green); border-color: var(--green);
+      animation: checkPop .35s cubic-bezier(.36,.07,.19,.97);
+    }
+    .check-wrap input:checked + .check-visual svg { opacity: 1; transform: scale(1); }
+    @keyframes checkPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    .task-text { flex: 1; font-size: .92rem; line-height: 1.35; }
+    .task-text.done { text-decoration: line-through; color: var(--ink-tertiary); }
+
+    .goal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* ── empty state ── */
+    .empty-state {
+      text-align: center; padding: 28px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+    }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 10px; }
+    .empty-state strong { display: block; margin-bottom: 4px; }
+
+    /* ── section header ── */
+    .section-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+
+    /* ── daily pulse ── */
+    .pulse-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;
+    }
+
+    /* ── bottom nav ── */
+    .bottom-nav {
+      position: fixed; left: 50%;
+      bottom: calc(10px + var(--safe-bottom));
+      transform: translateX(-50%);
+      width: min(calc(100% - 24px), 500px);
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px; border-radius: 22px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+      z-index: 10;
+    }
+    .nav-btn {
+      flex: 1; border: 0; background: transparent;
+      color: var(--ink-secondary);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 8px; border-radius: 16px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+      cursor: pointer;
+      transition: color .2s, background .2s;
+    }
+    .nav-btn svg { transition: transform .2s; }
+    .nav-btn.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .nav-btn.active svg { transform: scale(1.12); }
+    .nav-btn:active { transform: scale(.95); }
+
+    /* ── toast ── */
+    .toast {
+      position: fixed; left: 50%;
+      bottom: calc(var(--nav-h) + var(--safe-bottom) + 14px);
+      transform: translateX(-50%) translateY(14px);
+      background: rgba(30,30,38,.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      color: #fff; padding: 12px 20px;
+      border-radius: 999px; font-size: .88rem; font-weight: 600;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      z-index: 20;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── confetti canvas ── */
+    #confetti {
+      position: fixed; inset: 0; pointer-events: none; z-index: 30;
+    }
+
+    /* ── responsive ── */
+    @media (max-width: 400px) {
+      .stats-row { flex-wrap: wrap; }
+      .stat { min-width: calc(50% - 5px); }
+      .form-row { grid-template-columns: 1fr; }
+      .pulse-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <main class="app">
+    <!-- ─── HOME ─── -->
+    <section class="screen active" id="screen-home" data-screen="home">
+      <section class="hero">
+        <div class="hero-top">
+          <div class="hero-title">
+            <span class="label" id="todayLabel">Hoy</span>
+            <h1>MetaPlay</h1>
+            <p class="sub" style="max-width:26ch;margin-top:4px">Metas grandes, movimientos pequeños, acción constante.</p>
+          </div>
+          <div class="streak-badge" id="streakPill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c.5 4-2 7-5 9 1.5 1.5 3 4 3 7h4c0-3 1.5-5.5 3-7-3-2-5.5-5-5-9z"/></svg>
+            <span id="streakText">0 días</span>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <span class="label">Avance</span>
+            <span class="stat-value accent" id="totalProgress">0%</span>
+          </div>
+          <div class="stat">
+            <span class="label">XP</span>
+            <span class="stat-value" id="xpDisplay">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Activas</span>
+            <span class="stat-value" id="activeCount">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- level -->
+      <section class="card level-card">
+        <div class="level-num" id="levelNum">1</div>
+        <div class="level-info">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 id="levelTitle">Iniciante</h3>
+            <span class="label" id="levelXpLabel">0 / 60 XP</span>
+          </div>
+          <div class="level-bar-shell">
+            <div class="level-bar-fill" id="levelBar" style="width:0%"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- focus -->
+      <section class="focus-card" id="focusSection">
+        <div class="focus-top">
+          <div>
+            <span class="label" style="color:rgba(167,139,250,.6)">Modo enfoque</span>
+            <h2 style="color:#e8e4ff;margin-top:4px">Siguiente movimiento</h2>
+          </div>
+          <div class="focus-badge" id="focusBadge">Listo</div>
+        </div>
+        <div class="focus-body">
+          <p class="focus-main" id="focusText">Agrega una meta y te sugiero por dónde empezar.</p>
+          <p class="focus-hint" id="focusMeta">La app prioriza impacto alto y tareas fáciles de activar.</p>
+        </div>
+        <div class="focus-actions">
+          <button class="btn btn-primary" id="focusAction" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Crear meta
+          </button>
+          <button class="btn btn-ghost-light" id="focusJump" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            Ver metas
+          </button>
+        </div>
+      </section>
+
+      <!-- tu progreso -->
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <span class="label">Tu progreso</span>
+            <h2 style="margin-top:4px">Avance global</h2>
+          </div>
+        </div>
+        <div class="pulse-grid">
+          <div class="stat">
+            <span class="label">Tareas hechas</span>
+            <span class="stat-value" style="color:var(--green)" id="totalDoneCount">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Metas cerradas</span>
+            <span class="stat-value" style="color:var(--purple)" id="homeCompletedCount">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">En progreso</span>
+            <span class="stat-value" id="homeFocusCount">0</span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ─── CREATE ─── -->
+    <section class="screen" id="screen-create" data-screen="create">
+      <div style="padding:4px 2px 6px">
+        <span class="label">Captura rápida</span>
+        <h1 style="margin-top:6px;font-size:1.6rem">Nueva meta</h1>
+        <p class="sub" style="margin-top:6px">Guarda una meta accionable sin distraerte.</p>
+      </div>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <span class="label">Configura tu avance</span>
+            <h2 style="margin-top:4px">Crea algo accionable</h2>
+          </div>
+          <button class="btn btn-ghost btn-small" id="clearBtn" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            Limpiar
+          </button>
+        </div>
+
+        <form id="goalForm" class="form-grid">
+          <input class="input" id="goalInput" type="text" maxlength="80" placeholder="Ej: lanzar landing del proyecto" required autocomplete="off" />
+          <div class="form-row">
+            <div class="select-wrap">
+              <select id="priorityInput" aria-label="Prioridad">
+                <option value="high">🔴 Impacto alto</option>
+                <option value="medium" selected>🟡 Importante</option>
+                <option value="low">🔵 Ligera</option>
+              </select>
+            </div>
+            <div class="select-wrap">
+              <select id="energyInput" aria-label="Energía">
+                <option value="deep">🧠 Foco profundo</option>
+                <option value="light" selected>⚡ Rápida</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Crear meta
+          </button>
+        </form>
+      </section>
+    </section>
+
+    <!-- ─── GOALS ─── -->
+    <section class="screen" id="screen-goals" data-screen="goals">
+      <div style="padding:4px 2px 6px">
+        <span class="label">Organiza tu trabajo</span>
+        <h1 style="margin-top:6px;font-size:1.6rem">Tus metas</h1>
+        <p class="sub" style="margin-top:6px">Filtra, avanza y revisa tu historial.</p>
+      </div>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <span class="label">Vista activa</span>
+            <h2 style="margin-top:4px">Metas abiertas</h2>
+          </div>
+          <div class="streak-badge" style="background:var(--accent-soft);color:var(--accent)" id="goalsActiveBadge">0</div>
+        </div>
+
+        <div class="filter-row" id="filterRow">
+          <button class="chip active" type="button" data-filter="all">Todas</button>
+          <button class="chip" type="button" data-filter="high">🔴 Alto</button>
+          <button class="chip" type="button" data-filter="light">⚡ Rápidas</button>
+        </div>
+
+        <div class="goal-list" id="goalsList"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <div>
+            <span class="label">Historial</span>
+            <h2 style="margin-top:4px">Completadas</h2>
+          </div>
+        </div>
+        <div class="completed-list" id="completedList"></div>
+      </section>
+    </section>
+  </main>
+
+  <!-- ─── NAV ─── -->
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button class="nav-btn active" type="button" data-screen="home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" type="button" data-screen="create">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Crear
+    </button>
+    <button class="nav-btn" type="button" data-screen="goals">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Metas
+    </button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    "use strict";
+    var STORAGE_KEY = "metaplay_data_v4";
+
+    /* ── refs ── */
+    var $ = function(s) { return document.querySelector(s); };
+    var $$ = function(s) { return document.querySelectorAll(s); };
+
+    var refs = {
+      form: $("#goalForm"),
+      goalInput: $("#goalInput"),
+      priorityInput: $("#priorityInput"),
+      energyInput: $("#energyInput"),
+      goalsList: $("#goalsList"),
+      completedList: $("#completedList"),
+      clearBtn: $("#clearBtn"),
+      filterRow: $("#filterRow"),
+      totalProgress: $("#totalProgress"),
+      xpDisplay: $("#xpDisplay"),
+      activeCount: $("#activeCount"),
+      streakPill: $("#streakPill"),
+      streakText: $("#streakText"),
+      totalDoneCount: $("#totalDoneCount"),
+      homeFocusCount: $("#homeFocusCount"),
+      homeCompletedCount: $("#homeCompletedCount"),
+      goalsActiveBadge: $("#goalsActiveBadge"),
+      todayLabel: $("#todayLabel"),
+      focusText: $("#focusText"),
+      focusMeta: $("#focusMeta"),
+      focusBadge: $("#focusBadge"),
+      focusAction: $("#focusAction"),
+      focusJump: $("#focusJump"),
+      toast: $("#toast"),
+      levelNum: $("#levelNum"),
+      levelTitle: $("#levelTitle"),
+      levelXpLabel: $("#levelXpLabel"),
+      levelBar: $("#levelBar"),
+      confetti: $("#confetti"),
+      screens: $$(".screen"),
+      navBtns: $$(".nav-btn")
+    };
+
+    /* ── level system ── */
+    var LEVELS = [
+      { name: "Principiante", xp: 0 },
+      { name: "Explorador", xp: 60 },
+      { name: "Estratega", xp: 180 },
+      { name: "Constructor", xp: 400 },
+      { name: "Maestro", xp: 750 },
+      { name: "Leyenda", xp: 1200 }
+    ];
+    var XP_PER_TASK = 15;
+
+    var priorityRank = { high: 3, medium: 2, low: 1 };
+    var activeFilter = "all";
+    var currentScreen = "home";
+    var state = loadState();
+
+    setDateLabel();
+    render();
+
+    /* ── events ── */
+    refs.form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      var title = refs.goalInput.value.trim();
+      if (!title) return;
+      state.goals.unshift(createGoal(title, refs.priorityInput.value, refs.energyInput.value));
+      refs.form.reset();
+      refs.priorityInput.value = "medium";
+      refs.energyInput.value = "light";
+      saveState(); render();
+      switchScreen("goals");
+      showToast("Meta creada ✨");
+    });
+
+    refs.clearBtn.addEventListener("click", function() {
+      state.goals = state.goals.filter(function(g) { return !isGoalCompleted(g); });
+      saveState(); render();
+      showToast("Archivadas 🗑️");
+    });
+
+    refs.filterRow.addEventListener("click", function(e) {
+      var chip = e.target.closest("[data-filter]");
+      if (!chip) return;
+      activeFilter = chip.dataset.filter;
+      renderFilters(); renderGoals();
+    });
+
+    refs.goalsList.addEventListener("click", handleGoalAction);
+    refs.goalsList.addEventListener("change", handleGoalAction);
+
+    /* inline task input — submit on Enter */
+    refs.goalsList.addEventListener("keydown", function(e) {
+      if (e.key !== "Enter") return;
+      var input = e.target.closest(".inline-task-input");
+      if (!input) return;
+      e.preventDefault();
+      var goalId = input.dataset.goal;
+      var text = input.value.trim();
+      if (!text) return;
+      var goal = findGoal(goalId);
+      if (!goal) return;
+      goal.tasks.push({ id: uid(), title: text, done: false });
+      saveState(); render();
+      showToast("Acción agregada ✅");
+    });
+
+    function handleGoalAction(e) {
+      var target = e.target.closest("[data-action]");
+      if (!target) return;
+
+      var goalId = target.dataset.goal;
+      var taskId = target.dataset.task;
+      var action = target.dataset.action;
+      var goal = findGoal(goalId);
+      if (!goal) return;
+
+      if (action === "delete-goal") {
+        state.goals = state.goals.filter(function(g) { return g.id !== goalId; });
+        saveState(); render();
+        showToast("Meta eliminada");
+        return;
+      }
+
+      if (action === "add-task") {
+        /* toggle inline input */
+        var wrap = document.querySelector('.inline-input-wrap[data-for="' + goalId + '"]');
+        if (wrap) {
+          var isOpen = wrap.classList.toggle("open");
+          if (isOpen) wrap.querySelector(".input").focus();
+        }
+        return;
+      }
+
+      if (action === "submit-task") {
+        var inp = document.querySelector('.inline-task-input[data-goal="' + goalId + '"]');
+        if (!inp) return;
+        var text = inp.value.trim();
+        if (!text) return;
+        goal.tasks.push({ id: uid(), title: text, done: false });
+        saveState(); render();
+        showToast("Acción agregada ✅");
+        return;
+      }
+
+      if (action === "quick-start") {
+        goal.tasks.unshift({ id: uid(), title: suggestTask(goal), done: false });
+        saveState(); render();
+        showToast("Primer paso sugerido 🚀");
+        return;
+      }
+
+      if (action === "delete-task") {
+        goal.tasks = goal.tasks.filter(function(t) { return t.id !== taskId; });
+        saveState(); render();
+        return;
+      }
+
+      if (action === "toggle-task") {
+        var task = goal.tasks.find(function(t) { return t.id === taskId; });
+        if (!task) return;
+        var checkbox = target.querySelector('input[type="checkbox"]') || target;
+        task.done = checkbox.checked;
+        if (task.done) {
+          updateStreak();
+          /* check if goal just completed */
+          if (isGoalCompleted(goal)) {
+            fireConfetti();
+            showToast("🎉 Meta completada!");
+          }
+        }
+        saveState(); render();
+      }
+    }
+
+    refs.completedList.addEventListener("click", function(e) {
+      var target = e.target.closest("[data-action]");
+      if (!target) return;
+      var goalId = target.dataset.goal;
+      var action = target.dataset.action;
+      var goal = findGoal(goalId);
+      if (!goal) return;
+
+      if (action === "delete-goal") {
+        state.goals = state.goals.filter(function(g) { return g.id !== goalId; });
+        saveState(); render();
+        showToast("Eliminada");
+      }
+      if (action === "reopen-goal") {
+        goal.tasks.forEach(function(t) { t.done = false; });
+        saveState(); render();
+        showToast("Meta reabierta");
+      }
+    });
+
+    refs.focusAction.addEventListener("click", function() {
+      var rec = getFocusRecommendation();
+      if (!rec.goal) { switchScreen("create"); refs.goalInput.focus(); return; }
+      if (rec.task) { scrollToGoal(rec.goal.id); return; }
+      rec.goal.tasks.unshift({ id: uid(), title: suggestTask(rec.goal), done: false });
+      saveState(); render();
+      scrollToGoal(rec.goal.id);
+      showToast("Paso recomendado 🚀");
+    });
+
+    refs.focusJump.addEventListener("click", function() { switchScreen("goals"); });
+
+    document.querySelector(".bottom-nav").addEventListener("click", function(e) {
+      var btn = e.target.closest("[data-screen]");
+      if (btn) switchScreen(btn.dataset.screen);
+    });
+
+    /* ── core functions ── */
+    function createGoal(title, priority, energy) {
+      return {
+        id: uid(), title: title,
+        priority: normPriority(priority),
+        energy: normEnergy(energy),
+        tasks: [], createdAt: new Date().toISOString()
+      };
+    }
+
+    function render() {
+      renderFilters(); renderGoals(); renderCompleted(); renderStats(); renderFocus(); renderLevel();
+    }
+
+    function renderFilters() {
+      refs.filterRow.querySelectorAll("[data-filter]").forEach(function(c) {
+        c.classList.toggle("active", c.dataset.filter === activeFilter);
+      });
+    }
+
+    function renderGoals() {
+      var goals = getActiveGoals().filter(matchesFilter);
+      if (!goals.length) {
+        refs.goalsList.innerHTML =
+          '<div class="empty-state">' +
+            '<div class="empty-icon">📋</div>' +
+            '<strong>No hay metas aquí</strong>' +
+            '<p class="sub">Crea una nueva o cambia el filtro.</p>' +
+          '</div>';
+        return;
+      }
+      refs.goalsList.innerHTML = goals.map(renderGoalCard).join("");
+    }
+
+    function renderGoalCard(goal) {
+      var done = goal.tasks.filter(function(t) { return t.done; }).length;
+      var total = goal.tasks.length;
+      var pct = total ? Math.round(done * 100 / total) : 0;
+      var circumference = 2 * Math.PI * 22;
+      var offset = circumference - (pct / 100) * circumference;
+
+      var tasksHtml = goal.tasks.length
+        ? goal.tasks.map(function(t) {
+            return (
+              '<div class="task-row">' +
+                '<label class="check-wrap" data-action="toggle-task" data-goal="' + goal.id + '" data-task="' + t.id + '">' +
+                  '<input type="checkbox"' + (t.done ? ' checked' : '') + ' />' +
+                  '<div class="check-visual"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+                '</label>' +
+                '<span class="task-text' + (t.done ? ' done' : '') + '">' + esc(t.title) + '</span>' +
+                '<button type="button" class="btn-icon btn-danger" data-action="delete-task" data-goal="' + goal.id + '" data-task="' + t.id + '">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>' +
+              '</div>'
+            );
+          }).join("")
+        : '<div class="empty-state" style="padding:16px"><div class="empty-icon">🎯</div><strong>Sin acciones</strong><p class="sub">Agrega un primer paso.</p></div>';
+
+      return (
+        '<article class="goal-card" id="goal-' + goal.id + '">' +
+          '<div class="goal-top">' +
+            '<div style="flex:1;min-width:0">' +
+              '<div class="goal-title">' + esc(goal.title) + '</div>' +
+              '<div class="goal-tags">' +
+                '<span class="tag tag-' + goal.priority + '">' + priorityLabel(goal.priority) + '</span>' +
+                '<span class="tag tag-' + goal.energy + '">' + energyLabel(goal.energy) + '</span>' +
+                '<span class="tag tag-count">' + done + '/' + total + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="ring-wrap">' +
+              '<svg viewBox="0 0 50 50">' +
+                '<circle class="ring-bg" cx="25" cy="25" r="22"/>' +
+                '<circle class="ring-fill" cx="25" cy="25" r="22" stroke-dasharray="' + circumference.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '"/>' +
+              '</svg>' +
+              '<div class="ring-label">' + pct + '%</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="progress-shell"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+          '<div class="goal-actions">' +
+            '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
+            '</button>' +
+            '<button type="button" class="btn btn-ghost btn-small" data-action="quick-start" data-goal="' + goal.id + '">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Sugerir' +
+            '</button>' +
+            '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + goal.id + '">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="inline-input-wrap" data-for="' + goal.id + '">' +
+            '<input class="input inline-task-input" data-goal="' + goal.id + '" type="text" maxlength="100" placeholder="Escribe una acción..." autocomplete="off" />' +
+            '<button type="button" class="btn btn-primary btn-small" data-action="submit-task" data-goal="' + goal.id + '">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="task-list">' + tasksHtml + '</div>' +
+        '</article>'
+      );
+    }
+
+    function renderCompleted() {
+      var goals = getCompletedGoals();
+      if (!goals.length) {
+        refs.completedList.innerHTML =
+          '<div class="empty-state" style="margin-top:14px">' +
+            '<div class="empty-icon">🏆</div>' +
+            '<strong>Sin metas completadas aún</strong>' +
+            '<p class="sub">Completa todas las acciones de una meta.</p>' +
+          '</div>';
+        return;
+      }
+      refs.completedList.innerHTML = '<div class="goal-list" style="margin-top:14px">' + goals.map(function(g) {
+        return (
+          '<article class="goal-card" style="border-color:rgba(52,211,153,.15)">' +
+            '<div class="goal-top">' +
+              '<div style="flex:1;min-width:0">' +
+                '<div class="goal-title" style="color:var(--green)">' +
+                  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>' +
+                  esc(g.title) +
+                '</div>' +
+                '<div class="goal-tags">' +
+                  '<span class="tag tag-' + g.priority + '">' + priorityLabel(g.priority) + '</span>' +
+                  '<span class="tag tag-count">' + g.tasks.length + ' acciones</span>' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex;gap:6px">' +
+                '<button type="button" class="btn btn-ghost btn-small" data-action="reopen-goal" data-goal="' + g.id + '">Reabrir</button>' +
+                '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + g.id + '">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</article>'
+        );
+      }).join("") + '</div>';
+    }
+
+    function renderStats() {
+      var active = getActiveGoals();
+      var completed = getCompletedGoals();
+      var allTasks = state.goals.flatMap(function(g) { return g.tasks; });
+      var doneTasks = allTasks.filter(function(t) { return t.done; }).length;
+      var total = allTasks.length;
+      var pct = total ? Math.round(doneTasks * 100 / total) : 0;
+      var xp = doneTasks * XP_PER_TASK;
+
+      refs.totalProgress.textContent = pct + "%";
+      refs.xpDisplay.textContent = xp;
+      refs.activeCount.textContent = active.length;
+      refs.streakText.textContent = state.streak + " días";
+      refs.totalDoneCount.textContent = doneTasks;
+      refs.homeFocusCount.textContent = active.length;
+      refs.homeCompletedCount.textContent = completed.length;
+      refs.goalsActiveBadge.textContent = active.length + " activas";
+    }
+
+    function renderLevel() {
+      var allTasks = state.goals.flatMap(function(g) { return g.tasks; });
+      var doneTasks = allTasks.filter(function(t) { return t.done; }).length;
+      var xp = doneTasks * XP_PER_TASK;
+      var lvl = 0;
+      for (var i = LEVELS.length - 1; i >= 0; i--) {
+        if (xp >= LEVELS[i].xp) { lvl = i; break; }
+      }
+      var current = LEVELS[lvl];
+      var next = LEVELS[lvl + 1] || { xp: current.xp + 200 };
+      var progress = next.xp > current.xp ? ((xp - current.xp) / (next.xp - current.xp)) * 100 : 100;
+
+      refs.levelNum.textContent = lvl + 1;
+      refs.levelTitle.textContent = current.name;
+      refs.levelXpLabel.textContent = xp + " / " + next.xp + " XP";
+      refs.levelBar.style.width = Math.min(progress, 100) + "%";
+    }
+
+    function renderFocus() {
+      var rec = getFocusRecommendation();
+      if (!rec.goal) {
+        refs.focusBadge.textContent = "Nuevo";
+        refs.focusText.textContent = "Agrega una meta y la app te propone el siguiente paso.";
+        refs.focusMeta.textContent = "Pensado para abrir desde la pantalla de inicio y capturar ideas rápido.";
+        refs.focusAction.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Crear primera meta';
+        return;
+      }
+      refs.focusBadge.textContent = priorityLabel(rec.goal.priority);
+      refs.focusText.textContent = rec.task
+        ? rec.goal.title + "  →  " + rec.task.title
+        : rec.goal.title;
+      refs.focusMeta.textContent = rec.task
+        ? "Toca esa acción primero. Sesión " + energyLabel(rec.goal.energy).toLowerCase() + " recomendada."
+        : "Meta de impacto alto. Añade un paso para activarla.";
+      refs.focusAction.innerHTML = rec.task
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg> Ir a esa meta'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar tarea';
+    }
+
+    function switchScreen(name) {
+      currentScreen = name;
+      refs.screens.forEach(function(s) {
+        var isTarget = s.dataset.screen === name;
+        s.classList.toggle("active", isTarget);
+      });
+      refs.navBtns.forEach(function(b) {
+        b.classList.toggle("active", b.dataset.screen === name);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function scrollToGoal(goalId) {
+      switchScreen("goals");
+      requestAnimationFrame(function() {
+        var el = document.getElementById("goal-" + goalId);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+
+    /* ── helpers ── */
+    function getFocusRecommendation() {
+      var goal = getActiveGoals()[0] || null;
+      if (!goal) return { goal: null, task: null };
+      var task = goal.tasks.find(function(t) { return !t.done; }) || null;
+      return { goal: goal, task: task };
+    }
+
+    function getActiveGoals() {
+      return state.goals.filter(function(g) { return !isGoalCompleted(g); }).sort(compareGoals);
+    }
+
+    function getCompletedGoals() {
+      return state.goals.filter(isGoalCompleted).sort(function(a, b) {
+        return (b.createdAt || "").localeCompare(a.createdAt || "");
+      });
+    }
+
+    function compareGoals(a, b) {
+      var r = priorityRank[b.priority] - priorityRank[a.priority];
+      if (r) return r;
+      var ap = getRatio(a), bp = getRatio(b);
+      if (bp !== ap) return bp - ap;
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
+    }
+
+    function getRatio(g) {
+      if (!g.tasks.length) return 0;
+      return g.tasks.filter(function(t) { return t.done; }).length / g.tasks.length;
+    }
+
+    function matchesFilter(g) {
+      if (activeFilter === "all") return true;
+      if (activeFilter === "high") return g.priority === "high";
+      if (activeFilter === "light") return g.energy === "light";
+      return true;
+    }
+
+    function isGoalCompleted(g) {
+      return g.tasks.length > 0 && g.tasks.every(function(t) { return t.done; });
+    }
+
+    function findGoal(id) {
+      return state.goals.find(function(g) { return g.id === id; });
+    }
+
+    function updateStreak() {
+      var today = new Date().toISOString().slice(0, 10);
+      if (state.doneOn !== today) { state.doneOn = today; state.doneToday = 0; }
+      state.doneToday += 1;
+      if (state.lastDone === today) return;
+      if (!state.lastDone) { state.streak = 1; state.lastDone = today; return; }
+      var diff = Math.round((new Date(today) - new Date(state.lastDone)) / 864e5);
+      state.streak = diff === 1 ? state.streak + 1 : 1;
+      state.lastDone = today;
+    }
+
+    function suggestTask(g) {
+      var map = {
+        high:   { deep: "Definir el entregable clave y criterio de éxito", light: "Escribir el siguiente paso visible en una nota" },
+        medium: { deep: "Bloquear 25 min para avanzar sin interrupciones", light: "Crear checklist mínima de 3 pasos" },
+        low:    { deep: "Ordenar ideas y dejar una versión clara", light: "Resolver la tarea más fácil en <10 min" }
+      };
+      return (map[g.priority] || map.medium)[g.energy] || map.medium.light;
+    }
+
+    function normPriority(v) { return v === "high" || v === "low" ? v : "medium"; }
+    function normEnergy(v) { return v === "deep" ? "deep" : "light"; }
+    function priorityLabel(v) { return v === "high" ? "Impacto alto" : v === "low" ? "Ligera" : "Importante"; }
+    function energyLabel(v) { return v === "deep" ? "Foco profundo" : "Rápida"; }
+
+    function setDateLabel() {
+      refs.todayLabel.textContent = new Intl.DateTimeFormat("es-PA", {
+        weekday: "long", day: "numeric", month: "short"
+      }).format(new Date());
+    }
+
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+
+    function esc(s) {
+      return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    }
+
+    function showToast(text) {
+      refs.toast.textContent = text;
+      refs.toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(function() { refs.toast.classList.remove("show"); }, 1600);
+    }
+
+    /* ── confetti ── */
+    function fireConfetti() {
+      var cv = refs.confetti;
+      var ctx = cv.getContext("2d");
+      cv.width = window.innerWidth;
+      cv.height = window.innerHeight;
+      var pieces = [];
+      var colors = ["#ff6b3d","#fbbf24","#34d399","#a78bfa","#60a5fa","#f87171"];
+      for (var i = 0; i < 80; i++) {
+        pieces.push({
+          x: cv.width * .5 + (Math.random() - .5) * 200,
+          y: cv.height * .45,
+          vx: (Math.random() - .5) * 16,
+          vy: -Math.random() * 18 - 4,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          rv: (Math.random() - .5) * 12,
+          life: 1
+        });
+      }
+      var frame;
+      function draw() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        var alive = false;
+        pieces.forEach(function(p) {
+          if (p.life <= 0) return;
+          alive = true;
+          p.x += p.vx;
+          p.vy += .45;
+          p.y += p.vy;
+          p.rot += p.rv;
+          p.life -= .012;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * .6);
+          ctx.restore();
+        });
+        if (alive) frame = requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, cv.width, cv.height);
+      }
+      cancelAnimationFrame(frame);
+      draw();
+    }
+
+    /* ── persistence ── */
+    function loadState() {
+      var fallback = {
+        goals: [
+          {
+            id: uid(), title: "Lanzar mi proyecto iOS web",
+            priority: "high", energy: "deep",
+            createdAt: new Date().toISOString(),
+            tasks: [
+              { id: uid(), title: "Definir el valor principal de la app", done: true },
+              { id: uid(), title: "Crear una pantalla inicial más clara", done: false }
+            ]
+          },
+          {
+            id: uid(), title: "Preparar portfolio",
+            priority: "medium", energy: "light",
+            createdAt: new Date(Date.now() - 36e5).toISOString(),
+            tasks: []
+          }
+        ],
+        streak: 0, lastDone: "", doneOn: "", doneToday: 0
+      };
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY)
+          || localStorage.getItem("metaplay_data_v3")
+          || localStorage.getItem("metaplay_data_v2");
+        if (!raw) return fallback;
+        var p = JSON.parse(raw);
+        if (!p || !Array.isArray(p.goals)) return fallback;
+        return {
+          goals: p.goals.map(function(g) {
+            return {
+              id: g.id || uid(),
+              title: g.title || "Meta sin título",
+              priority: normPriority(g.priority),
+              energy: normEnergy(g.energy),
+              createdAt: g.createdAt || new Date().toISOString(),
+              tasks: Array.isArray(g.tasks) ? g.tasks.map(function(t) {
+                return { id: t.id || uid(), title: t.title || "Acción", done: Boolean(t.done) };
+              }) : []
+            };
+          }),
+          streak: Number(p.streak) || 0,
+          lastDone: p.lastDone || "",
+          doneOn: p.doneOn || "",
+          doneToday: Number(p.doneToday) || 0
+        };
+      } catch(e) { return fallback; }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+  </script>
+</body>
+</html>
