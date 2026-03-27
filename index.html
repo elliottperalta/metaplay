@@ -7,8 +7,71 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="MetaPlay" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0f' width='100' height='100' rx='22'/><text x='50' y='68' text-anchor='middle' font-size='52'>🎯</text></svg>" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <title>MetaPlay</title>
+  <script>
+    /* Generate 180x180 PNG icon for iOS from canvas */
+    (function() {
+      var cv = document.createElement("canvas");
+      cv.width = 180; cv.height = 180;
+      var c = cv.getContext("2d");
+      var r = 180;
+
+      /* bg */
+      var bg = c.createLinearGradient(0, 0, r, r);
+      bg.addColorStop(0, "#1a1030"); bg.addColorStop(.5, "#0f0a1a"); bg.addColorStop(1, "#0a0a0f");
+      c.beginPath(); c.roundRect(0, 0, r, r, 39); c.fillStyle = bg; c.fill();
+
+      /* glow */
+      var g1 = c.createRadialGradient(54, 45, 0, 54, 45, 90);
+      g1.addColorStop(0, "rgba(255,107,61,0.3)"); g1.addColorStop(1, "transparent");
+      c.fillStyle = g1; c.fillRect(0, 0, r, r);
+      var g2 = c.createRadialGradient(135, 144, 0, 135, 144, 80);
+      g2.addColorStop(0, "rgba(167,139,250,0.2)"); g2.addColorStop(1, "transparent");
+      c.fillStyle = g2; c.fillRect(0, 0, r, r);
+
+      var cx = 90, cy = 82;
+
+      /* target rings */
+      [46, 32, 18].forEach(function(rad, i) {
+        c.beginPath(); c.arc(cx, cy, rad, 0, Math.PI * 2);
+        c.strokeStyle = "rgba(255,255,255," + (0.06 + i * 0.02) + ")";
+        c.lineWidth = [6, 5, 4][i]; c.stroke();
+      });
+
+      /* progress arc */
+      var accent = c.createLinearGradient(cx - 46, cy - 46, cx + 46, cy + 46);
+      accent.addColorStop(0, "#ff6b3d"); accent.addColorStop(1, "#ff9563");
+      c.beginPath(); c.arc(cx, cy, 46, -Math.PI / 2, -Math.PI / 2 + Math.PI * 1.4);
+      c.strokeStyle = accent; c.lineWidth = 6; c.lineCap = "round"; c.stroke();
+
+      /* center dot */
+      c.beginPath(); c.arc(cx, cy, 8, 0, Math.PI * 2);
+      c.fillStyle = "#ff6b3d"; c.fill();
+      c.beginPath(); c.arc(cx, cy, 3.5, 0, Math.PI * 2);
+      c.fillStyle = "#fff"; c.fill();
+
+      /* check badge */
+      var bx = 122, by = 50;
+      c.beginPath(); c.arc(bx, by, 13, 0, Math.PI * 2);
+      var purp = c.createLinearGradient(bx - 13, by - 13, bx + 13, by + 13);
+      purp.addColorStop(0, "#a78bfa"); purp.addColorStop(1, "#7c5ce0");
+      c.fillStyle = purp; c.fill();
+      c.beginPath(); c.moveTo(bx - 5, by); c.lineTo(bx - 1, by + 4); c.lineTo(bx + 7, by - 4);
+      c.strokeStyle = "#fff"; c.lineWidth = 2.5; c.lineCap = "round"; c.lineJoin = "round"; c.stroke();
+
+      /* text */
+      c.font = "900 25px -apple-system, SF Pro Display, Helvetica Neue, sans-serif";
+      c.textAlign = "center"; c.letterSpacing = "-1px";
+      c.fillStyle = "#ff6b3d"; c.fillText("META", 90, 152);
+
+      /* apply as apple-touch-icon */
+      var url = cv.toDataURL("image/png");
+      var link = document.querySelector('link[rel="apple-touch-icon"]');
+      if (link) link.href = url;
+    })();
+  </script>
   <style>
     :root {
       --bg: #0a0a0f;

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1030"/>
+      <stop offset="50%" stop-color="#0f0a1a"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff6b3d"/>
+      <stop offset="100%" stop-color="#ff9563"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c5ce0"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="30%" cy="25%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,107,61,0.3)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="75%" cy="80%" r="45%">
+      <stop offset="0%" stop-color="rgba(167,139,250,0.2)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- ambient glows -->
+  <rect width="512" height="512" rx="112" fill="url(#glow1)"/>
+  <rect width="512" height="512" rx="112" fill="url(#glow2)"/>
+
+  <!-- target rings -->
+  <circle cx="256" cy="240" r="130" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="18"/>
+  <circle cx="256" cy="240" r="90" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14"/>
+  <circle cx="256" cy="240" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+
+  <!-- progress arc (accent) -->
+  <circle cx="256" cy="240" r="130" fill="none" stroke="url(#accent)" stroke-width="18"
+    stroke-linecap="round" stroke-dasharray="817" stroke-dashoffset="245"
+    transform="rotate(-90 256 240)" opacity="0.9"/>
+
+  <!-- center dot -->
+  <circle cx="256" cy="240" r="22" fill="url(#accent)"/>
+  <circle cx="256" cy="240" r="10" fill="#fff" opacity="0.95"/>
+
+  <!-- checkmark on top-right -->
+  <circle cx="348" cy="148" r="36" fill="url(#purple)"/>
+  <polyline points="332,148 344,160 366,138" fill="none" stroke="#fff"
+    stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- text "M" stylized -->
+  <text x="256" y="430" text-anchor="middle" font-family="-apple-system, SF Pro Display, Helvetica Neue, sans-serif"
+    font-size="72" font-weight="900" letter-spacing="-3" fill="url(#accent)">META</text>
+  <text x="256" y="430" text-anchor="middle" font-family="-apple-system, SF Pro Display, Helvetica Neue, sans-serif"
+    font-size="72" font-weight="900" letter-spacing="-3" fill="rgba(255,255,255,0.15)">META</text>
+</svg>
