@@ -106,10 +106,10 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { height: 100%; -webkit-text-size-adjust: 100%; }
+    html { height: 100%; min-height: 100dvh; -webkit-text-size-adjust: 100%; }
 
     body {
-      height: 100%;
+      min-height: 100dvh;
       font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
       background: var(--bg);
       color: var(--ink);
@@ -141,7 +141,7 @@
       position: relative; z-index: 1;
       width: min(100%, 520px);
       margin: 0 auto;
-      min-height: 100%;
+      min-height: 100dvh;
       padding: calc(var(--safe-top) + 12px) 16px calc(var(--nav-h) + var(--safe-bottom) + 16px);
     }
 
@@ -150,7 +150,11 @@
       display: none; gap: 14px;
       animation: screenIn .38s cubic-bezier(.36,.07,.19,.97) both;
     }
-    .screen.active { display: grid; align-content: start; }
+    .screen.active {
+      display: grid;
+      align-content: start;
+      min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - var(--nav-h) - 28px);
+    }
     @keyframes screenIn {
       from { opacity: 0; transform: translateY(18px) scale(.98); }
       to { opacity: 1; transform: none; }
@@ -246,6 +250,7 @@
       border-radius: var(--radius-xl);
       padding: 20px;
       position: relative; overflow: hidden;
+      cursor: pointer;
     }
     .focus-card::before {
       content: ""; position: absolute; top: -20px; right: -20px;
@@ -743,6 +748,7 @@
       focusText: $("#focusText"),
       focusMeta: $("#focusMeta"),
       focusBadge: $("#focusBadge"),
+      focusSection: $("#focusSection"),
       focusAction: $("#focusAction"),
       focusJump: $("#focusJump"),
       toast: $("#toast"),
@@ -858,13 +864,6 @@
         return;
       }
 
-      if (action === "quick-start") {
-        goal.tasks.unshift({ id: uid(), title: suggestTask(goal), done: false });
-        saveState(); render();
-        showToast("Primer paso sugerido 🚀");
-        return;
-      }
-
       if (action === "delete-task") {
         goal.tasks = goal.tasks.filter(function(t) { return t.id !== taskId; });
         saveState(); render();
@@ -919,6 +918,11 @@
     });
 
     refs.focusJump.addEventListener("click", function() { switchScreen("goals"); });
+
+    refs.focusSection.addEventListener("click", function(e) {
+      if (e.target.closest("button")) return;
+      switchScreen("goals");
+    });
 
     document.querySelector(".bottom-nav").addEventListener("click", function(e) {
       var btn = e.target.closest("[data-screen]");
@@ -988,11 +992,6 @@
           '<div class="goal-top">' +
             '<div style="flex:1;min-width:0">' +
               '<div class="goal-title">' + esc(goal.title) + '</div>' +
-              '<div class="goal-tags">' +
-                '<span class="tag tag-' + goal.priority + '">' + priorityLabel(goal.priority) + '</span>' +
-                '<span class="tag tag-' + goal.energy + '">' + energyLabel(goal.energy) + '</span>' +
-                '<span class="tag tag-count">' + done + '/' + total + '</span>' +
-              '</div>' +
             '</div>' +
             '<div class="ring-wrap">' +
               '<svg viewBox="0 0 50 50">' +
@@ -1006,9 +1005,6 @@
           '<div class="goal-actions">' +
             '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
-            '</button>' +
-            '<button type="button" class="btn btn-ghost btn-small" data-action="quick-start" data-goal="' + goal.id + '">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Sugerir' +
             '</button>' +
             '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + goal.id + '">' +
               '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>' +
@@ -1044,10 +1040,6 @@
                 '<div class="goal-title" style="color:var(--green)">' +
                   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>' +
                   esc(g.title) +
-                '</div>' +
-                '<div class="goal-tags">' +
-                  '<span class="tag tag-' + g.priority + '">' + priorityLabel(g.priority) + '</span>' +
-                  '<span class="tag tag-count">' + g.tasks.length + ' acciones</span>' +
                 '</div>' +
               '</div>' +
               '<div style="display:flex;gap:6px">' +
