@@ -243,30 +243,54 @@
       font-size: .72rem; font-weight: 800; color: var(--ink);
     }
 
-    /* ── focus card ── */
-    .focus-card {
-      background: linear-gradient(135deg, #1a1240, #2d1f6e 50%, #1a1240);
-      border: 1px solid rgba(167,139,250,0.15);
+    /* ── home spotlight ── */
+    .home-spotlight {
+      background:
+        linear-gradient(140deg, rgba(255,107,61,.14), rgba(96,165,250,.09) 48%, rgba(52,211,153,.08)),
+        var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: var(--radius-xl);
-      padding: 20px;
-      position: relative; overflow: hidden;
-      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
-    .focus-card::before {
-      content: ""; position: absolute; top: -20px; right: -20px;
-      width: 120px; height: 120px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(167,139,250,.25), transparent 70%);
+    .home-spotlight::after {
+      content: "";
+      position: absolute;
+      left: -30px;
+      bottom: -60px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+      pointer-events: none;
     }
-    .focus-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; position: relative; z-index: 1; }
-    .focus-body { position: relative; z-index: 1; margin-top: 14px; }
-    .focus-main { font-size: 1.1rem; font-weight: 600; line-height: 1.35; color: #e8e4ff; }
-    .focus-hint { font-size: .84rem; color: rgba(232,228,255,.5); margin-top: 8px; }
-    .focus-actions { display: flex; gap: 10px; margin-top: 18px; position: relative; z-index: 1; }
-    .focus-badge {
-      padding: 6px 12px; border-radius: 999px;
-      background: rgba(167,139,250,.15); color: var(--purple);
-      font-size: .76rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+    .spotlight-copy { position: relative; z-index: 1; }
+    .spotlight-copy h2 { margin-top: 4px; }
+    .spotlight-copy .sub { margin-top: 8px; max-width: 42ch; }
+    .spotlight-hint {
+      margin-top: 10px;
+      color: var(--ink-secondary);
+      font-size: .82rem;
+      line-height: 1.35;
     }
+    .spotlight-actions { display: flex; gap: 10px; margin-top: 16px; position: relative; z-index: 1; }
+
+    /* ── create upgrades ── */
+    .create-preview {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.03);
+    }
+    .preview-title {
+      margin-top: 8px;
+      font-size: .98rem;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1.35;
+    }
+    .preview-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 
     /* ── level bar ── */
     .level-card {
@@ -391,8 +415,6 @@
     .tag-high { background: rgba(248,113,113,.12); color: var(--red); }
     .tag-medium { background: var(--yellow-soft); color: var(--yellow); }
     .tag-low { background: var(--blue-soft); color: var(--blue); }
-    .tag-deep { background: var(--purple-soft); color: var(--purple); }
-    .tag-light { background: var(--green-soft); color: var(--green); }
     .tag-count { background: rgba(255,255,255,0.06); color: var(--ink-secondary); }
 
     /* ── goal cards ── */
@@ -578,6 +600,25 @@
         </div>
       </section>
 
+      <section class="card home-spotlight" id="homeSpotlight">
+        <div class="spotlight-copy">
+          <span class="label" id="spotlightLabel">Primer impulso</span>
+          <h2 id="spotlightTitle">Empieza con una meta de 15 minutos</h2>
+          <p class="sub" id="spotlightText">Cuando conviertes una idea en primer paso, el resto se vuelve mucho mas facil.</p>
+          <p class="spotlight-hint" id="spotlightHint">Tip: usa una accion que puedas terminar hoy.</p>
+        </div>
+        <div class="spotlight-actions">
+          <button class="btn btn-primary" id="spotlightPrimary" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Crear primera meta
+          </button>
+          <button class="btn btn-ghost" id="spotlightSecondary" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            Ir a crear
+          </button>
+        </div>
+      </section>
+
       <!-- level -->
       <section class="card level-card">
         <div class="level-num" id="levelNum">1</div>
@@ -589,31 +630,6 @@
           <div class="level-bar-shell">
             <div class="level-bar-fill" id="levelBar" style="width:0%"></div>
           </div>
-        </div>
-      </section>
-
-      <!-- focus -->
-      <section class="focus-card" id="focusSection">
-        <div class="focus-top">
-          <div>
-            <span class="label" style="color:rgba(167,139,250,.6)">Modo enfoque</span>
-            <h2 style="color:#e8e4ff;margin-top:4px">Siguiente movimiento</h2>
-          </div>
-          <div class="focus-badge" id="focusBadge">Listo</div>
-        </div>
-        <div class="focus-body">
-          <p class="focus-main" id="focusText">Agrega una meta y te sugiero por dónde empezar.</p>
-          <p class="focus-hint" id="focusMeta">La app prioriza impacto alto y tareas fáciles de activar.</p>
-        </div>
-        <div class="focus-actions">
-          <button class="btn btn-primary" id="focusAction" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Crear meta
-          </button>
-          <button class="btn btn-ghost-light" id="focusJump" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-            Ver metas
-          </button>
         </div>
       </section>
 
@@ -641,26 +657,26 @@
 
         <form id="goalForm" class="form-grid">
           <input class="input" id="goalInput" type="text" maxlength="80" placeholder="Ej: lanzar landing del proyecto" required autocomplete="off" />
-          <div class="form-row">
-            <div class="select-wrap">
-              <select id="priorityInput" aria-label="Prioridad">
-                <option value="high">🔴 Impacto alto</option>
-                <option value="medium" selected>🟡 Importante</option>
-                <option value="low">🔵 Ligera</option>
-              </select>
-            </div>
-            <div class="select-wrap">
-              <select id="energyInput" aria-label="Energía">
-                <option value="deep">🧠 Foco profundo</option>
-                <option value="light" selected>⚡ Rápida</option>
-              </select>
-            </div>
+          <div class="select-wrap">
+            <select id="priorityInput" aria-label="Impacto">
+              <option value="high">🔴 Impacto alto</option>
+              <option value="medium" selected>🟡 Impacto medio</option>
+              <option value="low">🔵 Impacto bajo</option>
+            </select>
           </div>
           <button class="btn btn-primary" type="submit" style="width:100%">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Crear meta
           </button>
         </form>
+
+        <article class="create-preview" aria-live="polite">
+          <span class="label">Vista previa</span>
+          <p class="preview-title" id="previewTitle">Tu meta aparecera aqui</p>
+          <div class="preview-tags">
+            <span class="tag" id="previewPriority">Impacto medio</span>
+          </div>
+        </article>
       </section>
     </section>
 
@@ -684,7 +700,8 @@
         <div class="filter-row" id="filterRow">
           <button class="chip active" type="button" data-filter="all">Todas</button>
           <button class="chip" type="button" data-filter="high">🔴 Alto</button>
-          <button class="chip" type="button" data-filter="light">⚡ Rápidas</button>
+          <button class="chip" type="button" data-filter="medium">🟡 Medio</button>
+          <button class="chip" type="button" data-filter="low">🔵 Bajo</button>
         </div>
 
         <div class="goal-list" id="goalsList"></div>
@@ -732,7 +749,6 @@
       form: $("#goalForm"),
       goalInput: $("#goalInput"),
       priorityInput: $("#priorityInput"),
-      energyInput: $("#energyInput"),
       goalsList: $("#goalsList"),
       completedList: $("#completedList"),
       clearBtn: $("#clearBtn"),
@@ -745,12 +761,15 @@
 
       goalsActiveBadge: $("#goalsActiveBadge"),
       todayLabel: $("#todayLabel"),
-      focusText: $("#focusText"),
-      focusMeta: $("#focusMeta"),
-      focusBadge: $("#focusBadge"),
-      focusSection: $("#focusSection"),
-      focusAction: $("#focusAction"),
-      focusJump: $("#focusJump"),
+      homeSpotlight: $("#homeSpotlight"),
+      spotlightLabel: $("#spotlightLabel"),
+      spotlightTitle: $("#spotlightTitle"),
+      spotlightText: $("#spotlightText"),
+      spotlightHint: $("#spotlightHint"),
+      spotlightPrimary: $("#spotlightPrimary"),
+      spotlightSecondary: $("#spotlightSecondary"),
+      previewTitle: $("#previewTitle"),
+      previewPriority: $("#previewPriority"),
       toast: $("#toast"),
       levelNum: $("#levelNum"),
       levelTitle: $("#levelTitle"),
@@ -785,10 +804,9 @@
       e.preventDefault();
       var title = refs.goalInput.value.trim();
       if (!title) return;
-      state.goals.unshift(createGoal(title, refs.priorityInput.value, refs.energyInput.value));
+      state.goals.unshift(createGoal(title, refs.priorityInput.value));
       refs.form.reset();
       refs.priorityInput.value = "medium";
-      refs.energyInput.value = "light";
       saveState(); render();
       switchScreen("goals");
       showToast("Meta creada ✨");
@@ -799,6 +817,9 @@
       saveState(); render();
       showToast("Archivadas 🗑️");
     });
+
+    refs.goalInput.addEventListener("input", renderCreatePreview);
+    refs.priorityInput.addEventListener("change", renderCreatePreview);
 
     refs.filterRow.addEventListener("click", function(e) {
       var chip = e.target.closest("[data-filter]");
@@ -907,21 +928,19 @@
       }
     });
 
-    refs.focusAction.addEventListener("click", function() {
-      var rec = getFocusRecommendation();
-      if (!rec.goal) return;
-      if (rec.task) { scrollToGoal(rec.goal.id); return; }
-      rec.goal.tasks.unshift({ id: uid(), title: suggestTask(rec.goal), done: false });
-      saveState(); render();
-      scrollToGoal(rec.goal.id);
-      showToast("Paso recomendado 🚀");
+    refs.spotlightPrimary.addEventListener("click", function() {
+      var active = getActiveGoals();
+      if (active.length) {
+        scrollToGoal(active[0].id);
+        return;
+      }
+      switchScreen("create");
+      refs.goalInput.focus();
     });
 
-    refs.focusJump.addEventListener("click", function() { switchScreen("goals"); });
-
-    refs.focusSection.addEventListener("click", function(e) {
-      if (e.target.closest("button")) return;
-      switchScreen("goals");
+    refs.spotlightSecondary.addEventListener("click", function() {
+      switchScreen("create");
+      refs.goalInput.focus();
     });
 
     document.querySelector(".bottom-nav").addEventListener("click", function(e) {
@@ -930,17 +949,50 @@
     });
 
     /* ── core functions ── */
-    function createGoal(title, priority, energy) {
+    function createGoal(title, priority) {
       return {
         id: uid(), title: title,
         priority: normPriority(priority),
-        energy: normEnergy(energy),
         tasks: [], createdAt: new Date().toISOString()
       };
     }
 
     function render() {
-      renderFilters(); renderGoals(); renderCompleted(); renderStats(); renderFocus(); renderLevel();
+      renderFilters(); renderGoals(); renderCompleted(); renderStats(); renderLevel(); renderHomeSpotlight(); renderCreatePreview();
+    }
+
+    function renderHomeSpotlight() {
+      var active = getActiveGoals();
+      var first = active[0] || null;
+      if (!first) {
+        refs.spotlightLabel.textContent = "Primer impulso";
+        refs.spotlightTitle.textContent = "Empieza con una meta de 15 minutos";
+        refs.spotlightText.textContent = "Cuando conviertes una idea en primer paso, el resto se vuelve mucho mas facil.";
+        refs.spotlightHint.textContent = "Tip: usa una accion que puedas terminar hoy.";
+        refs.spotlightPrimary.innerHTML =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Crear primera meta';
+        refs.spotlightSecondary.innerHTML =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg> Ir a crear';
+        return;
+      }
+      var pending = first.tasks.filter(function(t) { return !t.done; }).length;
+      refs.spotlightLabel.textContent = "Ahora mismo";
+      refs.spotlightTitle.textContent = "Tu mejor proxima meta: " + first.title;
+      refs.spotlightText.textContent = pending
+        ? "Te quedan " + pending + " acciones por cerrar. Si haces una ahora, subes ritmo y XP."
+        : "Esta meta aun no tiene acciones. Crea una para activarla ya.";
+      refs.spotlightHint.textContent = "Nivel de impacto: " + priorityLabel(first.priority).toLowerCase() + ".";
+      refs.spotlightPrimary.innerHTML =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg> Retomar meta';
+      refs.spotlightSecondary.innerHTML =
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nueva meta';
+    }
+
+    function renderCreatePreview() {
+      var title = refs.goalInput.value.trim();
+      refs.previewTitle.textContent = title || "Tu meta aparecera aqui";
+      refs.previewPriority.className = "tag " + toPriorityTagClass(refs.priorityInput.value);
+      refs.previewPriority.textContent = priorityLabel(refs.priorityInput.value);
     }
 
     function renderFilters() {
@@ -1089,28 +1141,6 @@
       refs.levelBar.style.width = Math.min(progress, 100) + "%";
     }
 
-    function renderFocus() {
-      var active = getActiveGoals();
-      var section = document.getElementById("focusSection");
-      /* 0-1 metas: ocultar — no aporta valor */
-      if (active.length < 2) {
-        section.style.display = "none";
-        return;
-      }
-      section.style.display = "";
-      var rec = getFocusRecommendation();
-      refs.focusBadge.textContent = priorityLabel(rec.goal.priority);
-      refs.focusText.textContent = rec.task
-        ? rec.goal.title + "  →  " + rec.task.title
-        : rec.goal.title;
-      refs.focusMeta.textContent = rec.task
-        ? "Toca esa acción primero. Sesión " + energyLabel(rec.goal.energy).toLowerCase() + " recomendada."
-        : "Meta de impacto alto. Añade un paso para activarla.";
-      refs.focusAction.innerHTML = rec.task
-        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg> Ir a esa meta'
-        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar tarea';
-    }
-
     function switchScreen(name) {
       currentScreen = name;
       refs.screens.forEach(function(s) {
@@ -1132,13 +1162,6 @@
     }
 
     /* ── helpers ── */
-    function getFocusRecommendation() {
-      var goal = getActiveGoals()[0] || null;
-      if (!goal) return { goal: null, task: null };
-      var task = goal.tasks.find(function(t) { return !t.done; }) || null;
-      return { goal: goal, task: task };
-    }
-
     function getActiveGoals() {
       return state.goals.filter(function(g) { return !isGoalCompleted(g); }).sort(compareGoals);
     }
@@ -1165,7 +1188,8 @@
     function matchesFilter(g) {
       if (activeFilter === "all") return true;
       if (activeFilter === "high") return g.priority === "high";
-      if (activeFilter === "light") return g.energy === "light";
+      if (activeFilter === "medium") return g.priority === "medium";
+      if (activeFilter === "low") return g.priority === "low";
       return true;
     }
 
@@ -1188,19 +1212,9 @@
       state.lastDone = today;
     }
 
-    function suggestTask(g) {
-      var map = {
-        high:   { deep: "Definir el entregable clave y criterio de éxito", light: "Escribir el siguiente paso visible en una nota" },
-        medium: { deep: "Bloquear 25 min para avanzar sin interrupciones", light: "Crear checklist mínima de 3 pasos" },
-        low:    { deep: "Ordenar ideas y dejar una versión clara", light: "Resolver la tarea más fácil en <10 min" }
-      };
-      return (map[g.priority] || map.medium)[g.energy] || map.medium.light;
-    }
-
     function normPriority(v) { return v === "high" || v === "low" ? v : "medium"; }
-    function normEnergy(v) { return v === "deep" ? "deep" : "light"; }
-    function priorityLabel(v) { return v === "high" ? "Impacto alto" : v === "low" ? "Ligera" : "Importante"; }
-    function energyLabel(v) { return v === "deep" ? "Foco profundo" : "Rápida"; }
+    function priorityLabel(v) { return v === "high" ? "Impacto alto" : v === "low" ? "Impacto bajo" : "Impacto medio"; }
+    function toPriorityTagClass(v) { return v === "high" ? "tag-high" : v === "low" ? "tag-low" : "tag-medium"; }
 
     function setDateLabel() {
       refs.todayLabel.textContent = new Intl.DateTimeFormat("es-PA", {
@@ -1288,7 +1302,6 @@
               id: g.id || uid(),
               title: g.title || "Meta sin título",
               priority: normPriority(g.priority),
-              energy: normEnergy(g.energy),
               createdAt: g.createdAt || new Date().toISOString(),
               tasks: Array.isArray(g.tasks) ? g.tasks.map(function(t) {
                 return { id: t.id || uid(), title: t.title || "Acción", done: Boolean(t.done) };
