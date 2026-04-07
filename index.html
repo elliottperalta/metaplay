@@ -435,28 +435,25 @@
     .goal-chevron {
       flex-shrink: 0; display: grid; place-items: center;
       width: 24px; height: 24px;
-      transform: translateZ(0);
-      transition: transform .25s ease;
+      transition: transform .2s ease;
     }
-    .goal-card.open .goal-chevron { transform: translateZ(0) rotate(180deg); }
+    .goal-card.open .goal-chevron { transform: rotate(180deg); }
     .goal-body {
-      max-height: 0;
-      overflow: hidden;
-      transform: translateZ(0);
-      will-change: max-height;
-      transition: max-height .28s ease;
+      display: none;
     }
     .goal-card.open .goal-body {
-      max-height: 2000px;
-      transition: max-height .35s ease-in;
+      display: block;
+      animation: fadeInBody .18s ease;
+    }
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .goal-summary {
       display: flex; align-items: center; gap: 8px;
       margin-top: 10px; font-size: .82rem; color: var(--ink-secondary);
-      transform: translateZ(0);
-      transition: opacity .2s ease;
     }
-    .goal-card.open .goal-summary { opacity: 0; height: 0; margin: 0; overflow: hidden; }
+    .goal-card.open .goal-summary { display: none; }
 
     /* ── progress bar ── */
     .progress-shell {
@@ -870,6 +867,18 @@
 
     refs.goalsList.addEventListener("click", handleGoalAction);
     refs.goalsList.addEventListener("change", handleGoalAction);
+
+    /* iOS: touchend for reliable tap on non-button elements */
+    refs.goalsList.addEventListener("touchend", function(e) {
+      var top = e.target.closest("[data-action='toggle-goal']");
+      if (!top) return;
+      e.preventDefault();
+      var goalId = top.dataset.goal;
+      if (!goalId) return;
+      state.expandedGoals[goalId] = !state.expandedGoals[goalId];
+      var card = document.getElementById("goal-" + goalId);
+      if (card) card.classList.toggle("open", state.expandedGoals[goalId]);
+    });
 
     /* inline task input — submit on Enter */
     refs.goalsList.addEventListener("keydown", function(e) {
