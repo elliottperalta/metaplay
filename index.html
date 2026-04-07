@@ -435,25 +435,28 @@
     .goal-chevron {
       flex-shrink: 0; display: grid; place-items: center;
       width: 24px; height: 24px;
-      transition: transform .3s cubic-bezier(.36,.07,.19,.97);
+      transform: translateZ(0);
+      transition: transform .25s ease;
     }
-    .goal-card.open .goal-chevron { transform: rotate(180deg); }
+    .goal-card.open .goal-chevron { transform: translateZ(0) rotate(180deg); }
     .goal-body {
-      display: grid;
-      grid-template-rows: 0fr;
-      transition: grid-template-rows .35s cubic-bezier(.36,.07,.19,.97);
+      max-height: 0;
+      overflow: hidden;
+      transform: translateZ(0);
+      will-change: max-height;
+      transition: max-height .28s ease;
     }
     .goal-card.open .goal-body {
-      grid-template-rows: 1fr;
-    }
-    .goal-body-inner {
-      overflow: hidden;
+      max-height: 2000px;
+      transition: max-height .35s ease-in;
     }
     .goal-summary {
       display: flex; align-items: center; gap: 8px;
       margin-top: 10px; font-size: .82rem; color: var(--ink-secondary);
+      transform: translateZ(0);
+      transition: opacity .2s ease;
     }
-    .goal-card.open .goal-summary { display: none; }
+    .goal-card.open .goal-summary { opacity: 0; height: 0; margin: 0; overflow: hidden; }
 
     /* ── progress bar ── */
     .progress-shell {
@@ -1066,8 +1069,9 @@
       var circumference = 2 * Math.PI * 22;
       var offset = circumference - (pct / 100) * circumference;
 
-      var tasksHtml = goal.tasks.length
-        ? goal.tasks.map(function(t) {
+      var sortedTasks = goal.tasks.slice().sort(function(a, b) { return a.done === b.done ? 0 : a.done ? 1 : -1; });
+      var tasksHtml = sortedTasks.length
+        ? sortedTasks.map(function(t) {
             return (
               '<div class="task-row">' +
                 '<label class="check-wrap" data-action="toggle-task" data-goal="' + goal.id + '" data-task="' + t.id + '">' +
@@ -1109,7 +1113,7 @@
             '<span>' + done + '/' + total + ' acciones</span>' +
             '<span style="color:' + (pending > 0 ? 'var(--yellow)' : 'var(--green)') + '">' + summaryText + '</span>' +
           '</div>' +
-          '<div class="goal-body"><div class="goal-body-inner">' +
+          '<div class="goal-body">' +
             '<div class="goal-actions">' +
               '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
@@ -1125,7 +1129,7 @@
               '</button>' +
             '</div>' +
             '<div class="task-list">' + tasksHtml + '</div>' +
-          '</div></div>' +
+          '</div>' +
         '</article>'
       );
     }
