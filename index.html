@@ -533,6 +533,7 @@
     }
     .nav-btn.active svg { transform: scale(1.08); }
     .nav-btn:active { transform: scale(.95); }
+    .bottom-nav.keyboard-open { opacity: 0; pointer-events: none; transition: opacity .2s; }
 
     /* ── toast ── */
     .toast {
@@ -820,6 +821,17 @@
 
     refs.goalInput.addEventListener("input", renderCreatePreview);
     refs.priorityInput.addEventListener("change", renderCreatePreview);
+
+    /* ── hide nav when virtual keyboard is open ── */
+    (function() {
+      var nav = document.querySelector(".bottom-nav");
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", function() {
+          var keyboardOpen = window.visualViewport.height < window.innerHeight * 0.75;
+          nav.classList.toggle("keyboard-open", keyboardOpen);
+        });
+      }
+    })();
 
     refs.filterRow.addEventListener("click", function(e) {
       var chip = e.target.closest("[data-filter]");
