@@ -390,6 +390,17 @@
     .inline-input-wrap .input { flex: 1; padding: 12px 14px; }
     .inline-input-wrap .btn { flex-shrink: 0; }
 
+    /* ── inline edit form ── */
+    .inline-edit-wrap {
+      display: none; gap: 10px; margin-top: 10px; flex-direction: column;
+      animation: slideDown .25s ease;
+    }
+    .inline-edit-wrap.open { display: flex; }
+    .inline-edit-row { display: flex; gap: 8px; }
+    .inline-edit-row .input { flex: 1; padding: 12px 14px; }
+    .inline-edit-row .select-wrap { flex: 1; }
+    .inline-edit-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
     /* ── chips / filters ── */
     .filter-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
     .chip {
@@ -930,6 +941,34 @@
         return;
       }
 
+      if (action === "edit-goal") {
+        var editWrap = document.querySelector('.inline-edit-wrap[data-edit-for="' + goalId + '"]');
+        if (editWrap) {
+          var isEditOpen = editWrap.classList.toggle("open");
+          if (isEditOpen) editWrap.querySelector(".inline-edit-title").focus();
+        }
+        return;
+      }
+
+      if (action === "cancel-edit") {
+        var editWrapCancel = document.querySelector('.inline-edit-wrap[data-edit-for="' + goalId + '"]');
+        if (editWrapCancel) editWrapCancel.classList.remove("open");
+        return;
+      }
+
+      if (action === "submit-edit") {
+        var titleInput = document.querySelector('.inline-edit-title[data-goal="' + goalId + '"]');
+        var prioritySelect = document.querySelector('.inline-edit-priority[data-goal="' + goalId + '"]');
+        if (!titleInput || !prioritySelect) return;
+        var newTitle = titleInput.value.trim();
+        if (!newTitle) return;
+        goal.title = newTitle;
+        goal.priority = normPriority(prioritySelect.value);
+        saveState(); render();
+        showToast("Meta actualizada ✏️");
+        return;
+      }
+
       if (action === "submit-task") {
         var inp = document.querySelector('.inline-task-input[data-goal="' + goalId + '"]');
         if (!inp) return;
@@ -1127,6 +1166,9 @@
               '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
               '</button>' +
+              '<button type="button" class="btn btn-ghost btn-small" data-action="edit-goal" data-goal="' + goal.id + '">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar' +
+              '</button>' +
               '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + goal.id + '">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>' +
               '</button>' +
@@ -1136,6 +1178,26 @@
               '<button type="button" class="btn btn-primary btn-small" data-action="submit-task" data-goal="' + goal.id + '">' +
                 '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
               '</button>' +
+            '</div>' +
+            '<div class="inline-edit-wrap" data-edit-for="' + goal.id + '">' +
+              '<div class="inline-edit-row">' +
+                '<input class="input inline-edit-title" data-goal="' + goal.id + '" type="text" maxlength="80" value="' + esc(goal.title) + '" placeholder="Nombre de la meta" autocomplete="off" />' +
+              '</div>' +
+              '<div class="inline-edit-row">' +
+                '<div class="select-wrap">' +
+                  '<select class="inline-edit-priority" data-goal="' + goal.id + '" aria-label="Impacto">' +
+                    '<option value="high"' + (goal.priority === 'high' ? ' selected' : '') + '>🔴 Impacto alto</option>' +
+                    '<option value="medium"' + (goal.priority === 'medium' ? ' selected' : '') + '>🟡 Impacto medio</option>' +
+                    '<option value="low"' + (goal.priority === 'low' ? ' selected' : '') + '>🔵 Impacto bajo</option>' +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+              '<div class="inline-edit-actions">' +
+                '<button type="button" class="btn btn-ghost btn-small" data-action="cancel-edit" data-goal="' + goal.id + '">Cancelar</button>' +
+                '<button type="button" class="btn btn-primary btn-small" data-action="submit-edit" data-goal="' + goal.id + '">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Guardar' +
+                '</button>' +
+              '</div>' +
             '</div>' +
             '<div class="task-list">' + tasksHtml + '</div>' +
           '</div>' +
