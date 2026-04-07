@@ -427,9 +427,33 @@
       padding: 18px;
       transition: background .2s;
     }
-    .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; cursor: pointer; -webkit-user-select: none; user-select: none; }
     .goal-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.3; }
     .goal-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+    /* ── collapsible goal body ── */
+    .goal-chevron {
+      flex-shrink: 0; display: grid; place-items: center;
+      width: 24px; height: 24px;
+      transition: transform .3s cubic-bezier(.36,.07,.19,.97);
+    }
+    .goal-card.open .goal-chevron { transform: rotate(180deg); }
+    .goal-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .35s cubic-bezier(.36,.07,.19,.97);
+    }
+    .goal-card.open .goal-body {
+      grid-template-rows: 1fr;
+    }
+    .goal-body-inner {
+      overflow: hidden;
+    }
+    .goal-summary {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 10px; font-size: .82rem; color: var(--ink-secondary);
+    }
+    .goal-card.open .goal-summary { display: none; }
 
     /* ── progress bar ── */
     .progress-shell {
@@ -796,6 +820,7 @@
     var activeFilter = "all";
     var currentScreen = "home";
     var state = loadState();
+    state.expandedGoals = {};
 
     setDateLabel();
     render();
@@ -868,6 +893,13 @@
       var action = target.dataset.action;
       var goal = findGoal(goalId);
       if (!goal) return;
+
+      if (action === "toggle-goal") {
+        state.expandedGoals[goalId] = !state.expandedGoals[goalId];
+        var card = document.getElementById("goal-" + goalId);
+        if (card) card.classList.toggle("open", state.expandedGoals[goalId]);
+        return;
+      }
 
       if (action === "delete-goal") {
         state.goals = state.goals.filter(function(g) { return g.id !== goalId; });
@@ -1051,9 +1083,13 @@
           }).join("")
         : '<div class="empty-state" style="padding:16px"><div class="empty-icon">🎯</div><strong>Sin acciones</strong><p class="sub">Agrega un primer paso.</p></div>';
 
+      var isOpen = state.expandedGoals && state.expandedGoals[goal.id];
+      var pending = total - done;
+      var summaryText = pending > 0 ? pending + ' pendiente' + (pending > 1 ? 's' : '') : 'Todo completado';
+
       return (
-        '<article class="goal-card" id="goal-' + goal.id + '">' +
-          '<div class="goal-top">' +
+        '<article class="goal-card' + (isOpen ? ' open' : '') + '" id="goal-' + goal.id + '">' +
+          '<div class="goal-top" data-action="toggle-goal" data-goal="' + goal.id + '">' +
             '<div style="flex:1;min-width:0">' +
               '<div class="goal-title">' + esc(goal.title) + '</div>' +
             '</div>' +
@@ -1064,23 +1100,32 @@
               '</svg>' +
               '<div class="ring-label">' + pct + '%</div>' +
             '</div>' +
+            '<div class="goal-chevron">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+            '</div>' +
           '</div>' +
           '<div class="progress-shell"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
-          '<div class="goal-actions">' +
-            '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
-            '</button>' +
-            '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + goal.id + '">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>' +
-            '</button>' +
+          '<div class="goal-summary">' +
+            '<span>' + done + '/' + total + ' acciones</span>' +
+            '<span style="color:' + (pending > 0 ? 'var(--yellow)' : 'var(--green)') + '">' + summaryText + '</span>' +
           '</div>' +
-          '<div class="inline-input-wrap" data-for="' + goal.id + '">' +
-            '<input class="input inline-task-input" data-goal="' + goal.id + '" type="text" maxlength="100" placeholder="Escribe una acción..." autocomplete="off" />' +
-            '<button type="button" class="btn btn-primary btn-small" data-action="submit-task" data-goal="' + goal.id + '">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-            '</button>' +
-          '</div>' +
-          '<div class="task-list">' + tasksHtml + '</div>' +
+          '<div class="goal-body"><div class="goal-body-inner">' +
+            '<div class="goal-actions">' +
+              '<button type="button" class="btn btn-ghost btn-small" data-action="add-task" data-goal="' + goal.id + '">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Acción' +
+              '</button>' +
+              '<button type="button" class="btn-icon btn-danger" data-action="delete-goal" data-goal="' + goal.id + '">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>' +
+              '</button>' +
+            '</div>' +
+            '<div class="inline-input-wrap" data-for="' + goal.id + '">' +
+              '<input class="input inline-task-input" data-goal="' + goal.id + '" type="text" maxlength="100" placeholder="Escribe una acción..." autocomplete="off" />' +
+              '<button type="button" class="btn btn-primary btn-small" data-action="submit-task" data-goal="' + goal.id + '">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+              '</button>' +
+            '</div>' +
+            '<div class="task-list">' + tasksHtml + '</div>' +
+          '</div></div>' +
         '</article>'
       );
     }
